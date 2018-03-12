@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://unpkg.com/imagesloaded@4/imagesloaded.pkgd.min.js"></script>
+    <script src="https://unpkg.com/masonry-layout@4/dist/masonry.pkgd.min.js"></script>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+
+    <style>
+    * {
+  -webkit-border-radius: 1px !important;
+     -moz-border-radius: 1px !important;
+          border-radius: 1px !important;
+      }
+      #logo {
+      color: #666;
+      width:100%;
+      }
+      #logo h1 {
+          font-size: 60px;
+          font-family: Roboto, sans-serif;
+          font-weight: 700;
+          letter-spacing: -1px;
+      }
+      #logo p{
+        padding-bottom: 20px;
+      }
+
+
+      #form-buscar >.form-group >.input-group > .form-control {
+          height: 40px;
+      }
+      #form-buscar >.form-group >.input-group > .input-group-btn > .btn{
+              height: 40px;
+              font-size: 16px;
+              font-weight: 300;
+
+
+      }
+      #form-buscar >.form-group >.input-group > .input-group-btn > .btn .glyphicon{
+       margin-right:12px;
+      }
+
+
+      #form-buscar >.form-group >.input-group > .form-control {
+          font-size: 16px;
+          font-weight: 300;
+
+      }
+
+      #form-buscar >.form-group >.input-group > .form-control:focus {
+        border-color: #33A444;
+        outline: 0;
+      }
+        #grid {
+      /* Prevent vertical gaps */
+      line-height: 0;
+
+      -webkit-column-count: 5;
+      -webkit-column-gap:   0px;
+      -moz-column-count:    5;
+      -moz-column-gap:      0px;
+      column-count:         5;
+      column-gap:           0px;
+    }
+
+    #grid img {
+      /* Just in case there are inline attributes */
+      width: 100% !important;
+      height: auto !important;
+    }
+    .collections {
+      margin: 20px;
+      text-align: center;
+    }
+    .collections ul {
+      list-style-type: none;
+    }
+
+    @media (max-width: 1200px) {
+      #photos {
+      -moz-column-count:    4;
+      -webkit-column-count: 4;
+      column-count:         4;
+      }
+    }
+    @media (max-width: 1000px) {
+      #photos {
+      -moz-column-count:    3;
+      -webkit-column-count: 3;
+      column-count:         3;
+      }
+    }
+    @media (max-width: 800px) {
+      #photos {
+      -moz-column-count:    2;
+      -webkit-column-count: 2;
+      column-count:         2;
+      }
+    }
+    @media (max-width: 400px) {
+      #photos {
+      -moz-column-count:    1;
+      -webkit-column-count: 1;
+      column-count:         1;
+      }
+    }
+    </style>
+    <title>Photo Collections</title>
+  </head>
+  <body>
+    <div id="wrapper">
+      <div id="header">
+        <div id="welcome">
+        Welcome, {{ first }}!
+        </div>
+        <div id="logout"><a href="/logout">Logout</a></div>
+      </div>
+    <div class="container" style="margin-top: 8%;">
+    <div class="col-md-6 col-md-offset-3">
+    <div class="row">
+    <div id = "logo" class="text-center">
+    <h1>Photo Collections</h1><p>featuring the Unsplash API</p>
+    </div>
+          <form action="search" role="form" id="form-buscar" method="POST">
+            {%csrf_token%}
+              <div class="form-group">
+                <div class="input-group">
+                  <input id="1" class="form-control" type="text" name="query" placeholder="Search" required/>
+                    <span class="input-group-btn">
+                      <button class="btn btn-success" type="submit">
+                      <i class="glyphicon glyphicon-search" aria-hidden="true"></i> Search
+                    </button>
+                  </span>
+                </div>
+              </div>
+          </form>
+        </div>
+      </div>
+    </div>
+    <div id="all-collections">
+      <div id="my collections" class="collections">
+        <h2>My collections</h2>
+        <ul>
+          {%for collection in collections%}
+          <li>
+            <h3><a href="/collections/{{collection.id}}">{{collection.name}}</a>
+            <a href="/collections/{{collection.id}}/delete">
+            <span class="glyphicon glyphicon-remove-sign"></span>
+          </a></h3>
+          </li>
+        {%endfor%}
+        </ul>
+      </div>
+
+      <div id="recent-collections" class ="collections">
+        <h2>Recently added collections</h2>
+          {%for collection in all_collections%}
+          <a href="/collections/{{collection.id}}"><h3>{{collection.name}}</h3></a>
+          <p>
+            by {{collection.creator.first}} {{collection.creator.last}}
+          </p>
+          {%endfor%}
+      </div>
+    </div>
+  </body>
+  <!-- <script>
+
+    $('#submit').on('click', function(){ //when the submit button is clicked:
+      var $results = $('#results') //saving the location i want to append to
+      var $query = $("#query").val(); // your search query
+      var unsplashUrl=
+      'https://api.unsplash.com/search/photos?client_id=9b088212945f40035d69d180afc387be3641bafe40efe3e9c070fa09064d91c3&per_page=30&query=' + $query;
+      //default photo search url + key + 30 results per page + query
+      //Below is the AJAX call that concats the previous variables and search query.
+      $.ajax({
+        type: 'GET',
+        url: unsplashUrl,
+        success: function(data) {
+          for (var i=0; i < data.results.length; i++){
+            $('#grid').append('<div class="grid-item"><img src='+data.results[i].urls.small+' alt='+$query+'></div>');
+            }
+          }
+      });
+    });
+  </script> -->
+</html>
